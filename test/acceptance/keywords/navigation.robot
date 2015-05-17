@@ -1,6 +1,7 @@
 *** Settings ***
 Documentation     Tests navigation
 Test Setup        Go To Page "links.html"
+Force Tags        navigation
 Resource          ../resource.robot
 
 *** Variables ***

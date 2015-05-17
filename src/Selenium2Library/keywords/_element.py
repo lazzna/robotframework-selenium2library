@@ -1023,3 +1023,4 @@ return !element.dispatchEvent(evt);
             raise AssertionError(message)
         self._info("Current page does not contain %s '%s'."
                    % (element_name, locator))
+

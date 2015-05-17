@@ -1,6 +1,7 @@
 *** Settings ***
 Documentation     Opening and closing browsers
 Suite Teardown    Close All Browsers
+Force Tags        openclose
 Resource          resource.robot
 
 *** Test Cases ***
