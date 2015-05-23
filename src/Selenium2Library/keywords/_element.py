@@ -5,7 +5,6 @@ from Selenium2Library import utils
 from Selenium2Library.locators import ElementFinder
 from Selenium2Library.locators import CustomLocator
 from keywordgroup import KeywordGroup
-import re
 
 try:
     basestring  # attempt to evaluate basestring
@@ -21,13 +20,6 @@ class _ElementKeywords(KeywordGroup):
         self._element_finder = ElementFinder()
 
     # Public, get element(s)
-
-    def get_webelement(self, locator):
-        """Returns the first WebElement matching the given locator.
-
-        See `introduction` for details about locating elements.
-        """
-        return self._element_find(locator, True, True)
 
     def get_webelements(self, locator):
         """Returns list of WebElement objects matching locator.
@@ -1023,4 +1015,3 @@ return !element.dispatchEvent(evt);
             raise AssertionError(message)
         self._info("Current page does not contain %s '%s'."
                    % (element_name, locator))
-
