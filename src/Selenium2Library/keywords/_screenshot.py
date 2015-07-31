@@ -3,7 +3,10 @@ import os, errno
 
 from Selenium2Library import utils
 from keywordgroup import KeywordGroup
+<<<<<<< HEAD
+=======
 
+>>>>>>> d11f6a419250469d7171bd3dcfdad6c31f4aedfb
 
 class _ScreenshotKeywords(KeywordGroup):
 
