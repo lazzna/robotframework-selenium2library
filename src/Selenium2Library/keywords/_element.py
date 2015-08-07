@@ -508,7 +508,7 @@ return !element.dispatchEvent(evt);
         # select it
         element.send_keys(key)
 
-    def press_keys(self, locator, keys=None):
+    def press_keys(self, locator, keys):
         """Simulates user pressing keys eventually modified with special keys on an element identified by `locator`.
 
         `keys` are any human readable characters, or numerical ASCII codes lead by '\\\\'.
@@ -575,6 +575,7 @@ return !element.dispatchEvent(evt);
                     first = False
 
         #text[:] = [x for x in text if x != ''] #removes empty entries
+        #self._debug("lkeys: %r\n" % (lkeys))
 
         mlist=[]
         #Processes ASCII codes inside text
@@ -600,53 +601,103 @@ return !element.dispatchEvent(evt);
         If keys[x] is ASCII put in sendkeys
         Else put in Press down and up
         """
+        # self._map_named_key_code_to_special_key('BACKSPACE'),
         modifiers = [self._map_named_key_code_to_special_key('CONTROL'),
+                     self._map_named_key_code_to_special_key('LEFT_CONTROL'),
                      self._map_named_key_code_to_special_key('SHIFT'),
-                     self._map_named_key_code_to_special_key('ALT')]
+                     self._map_named_key_code_to_special_key('LEFT_SHIFT'),
+                     self._map_named_key_code_to_special_key('ALT'),
+                     self._map_named_key_code_to_special_key('LEFT_ALT')]
         slist = []  #sendkey list
-        plist = []  #presskey list
-        for k in list(keys):
+        plist = []  #presskey list down and up
+        klist = []  #presskey list down
+        for k in lkeys:
+            #self._debug("k: %s\n" % (k))
             if k in modifiers:
                 slist.append('')
+                klist.append('')
                 plist.append(k)
             elif self._isprintable(k):
                 slist.append(k)
+                klist.append('')
                 plist.append('')
             else:
                 slist.append('')
-                plist.append(k)
+                klist.append(k)
+                plist.append('')
 
         #ActionChains(self._current_browser()).key_down(special_key1, element).key_down(special_key2, element).send_keys(key).key_up(special_key2, element).key_up(special_key1, element).perform()
-        #####print("%s\n%s\nmodifier%s" % (slist, plist, modifiers))
+        #self._debug("sl: %s\npl: %s\nmodifier: %s" % (slist, plist, modifiers))
+        self._debug("sl: %s\nkl: %s\npl: %s\n" % (slist, klist, plist))
 
         mytext = ''
         text = False
         MyAction = ActionChains(self._current_browser())
+        """
+        for ke in lkeys[:]:
+            MyAction.key_down(ke, element)
+        MyAction.perform()
+        """
         for k, ke in enumerate(slist):
             if text and ke != '':
                 mytext += ke
+            if not text and klist[k] != '':
+                self._debug("kpress down %r " % (klist[k]))
+                if len(klist[k]) > 1:
+                    MyAction.key_down(klist[k], element)   # Works fine for BACKSPACE but not \\032
+                else:
+                    MyAction.send_keys(klist[k])
+            if not text and plist[k] != '':
+                self._debug("press down %r " % (plist[k]))
+                MyAction.key_down(plist[k], element)
+                #MyAction.perform()
             if not text and ke != '':
                 mytext += ke
                 text = True
-            if not text and plist[k] != '':
-                #print("press down %r " % (plist[k]))
-                MyAction.key_down(plist[k], element)
-            elif text and plist[k] != '':
-                #print("send keys %s " % (mytext))
-                MyAction.send_keys(mytext)
-                #print("press down %r " % (plist[k]))
-                MyAction.key_down(plist[k], element)
+            if text and ( ke == '' or k == len(slist) - 1):
+                self._debug("%d send keys %s " % (k, mytext))
+                #MyAction.key_down(Keys.LEFT_ALT, element).key_up(Keys.LEFT_ALT, element)
+                #MyAction.send_keys(mytext)
+                # MyAction.key_up(Keys.NULL, element)
+                MyAction.key_down(mytext, element)
+                #for l in mytext:
+                #    MyAction.key_down(l, element)
+                # MyAction.key_up(mytext, element)
+                # MyAction.perform()
+                # element.send_keys(mytext)
                 text = False
                 mytext = ''
-            if text and slist[-1] != '':
-                #print("send keys %s " % (mytext))
-                MyAction.send_keys(mytext)
 
+            """
+            if text and plist[k] != '':
+                self._debug("1send keys %s " % (mytext))
+                MyAction.send_keys(mytext)
+                #MyAction.key_down(mytext, element)
+                #MyAction.perform()
+                #element.send_keys(mytext)
+                self._debug("press down %r " % (plist[k]))
+                MyAction.key_down(plist[k], element)
+                #MyAction.perform()
+                text = False
+                mytext = ''
+
+            if text and slist[-1] != '':
+                self._debug("last send keys %s " % (mytext))
+                element.send_keys(mytext)
+                #MyAction.send_keys(mytext)
+                #MyAction.key_down(mytext, element)
+                #MyAction.perform()
+                text = False
+                mytext = ''
+                #MyAction = ActionChains(self._current_browser())
+                #element.send_keys(mytext)
+            """
         for ke in reversed(plist):
             if ke != '':
-                #print("press up %r " % (ke))
+                self._debug("press up %r " % (ke))
                 MyAction.key_up(ke, element)
         #print("perform\n")
+
         MyAction.perform()
 
     # Public, links
@@ -918,9 +969,10 @@ return !element.dispatchEvent(evt);
         try:
            return getattr(Keys, key_name)
         except AttributeError:
-           message = "Unknown key named '%s'." % (key_name)
-           self._debug(message)
-           #raise ValueError(message)
+            message = "Unknown key named '%s'." % (key_name)
+            self._debug(message)
+            return None
+            #raise ValueError(message)
 
     def _parse_attribute_locator(self, attribute_locator):
         parts = attribute_locator.rpartition('@')
