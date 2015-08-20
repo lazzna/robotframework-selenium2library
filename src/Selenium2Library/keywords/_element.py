@@ -5,6 +5,7 @@ from Selenium2Library import utils
 from Selenium2Library.locators import ElementFinder
 from Selenium2Library.locators import CustomLocator
 from keywordgroup import KeywordGroup
+import re
 
 try:
     basestring  # attempt to evaluate basestring
@@ -20,6 +21,13 @@ class _ElementKeywords(KeywordGroup):
         self._element_finder = ElementFinder()
 
     # Public, get element(s)
+
+    def get_webelement(self, locator):
+        """Returns the first WebElement matching the given locator.
+
+        See `introduction` for details about locating elements.
+        """
+        return self._element_find(locator, True, True)
 
     def get_webelements(self, locator):
         """Returns list of WebElement objects matching locator.
@@ -524,10 +532,8 @@ return !element.dispatchEvent(evt);
         element = self._element_find(locator, True, True)
 
         myargs = re.split("([+|-])", keys)
-        ####print("Myargs = %s\n" % (myargs))
 
         special = []
-        text = []
         nospecial = True
         lkeys = []
         idx = 0
@@ -535,15 +541,27 @@ return !element.dispatchEvent(evt);
             if t != '' and nospecial:
                 if len(t) > 1:
                     try:
-                        special.append(self._map_named_key_code_to_special_key(t))
-                        lkeys.append(self._map_named_key_code_to_special_key(t))
-                        nospecial = False
-                    except AttributeError:
-                        text.append(t)
+                        mkey = self._map_named_key_code_to_special_key(t)
+                        if mkey != None:
+                            #self._debug("special: %r\n" % (mkey))
+                            special.append(mkey)
+                            lkeys.append(mkey)
+                            nospecial = False
+                        else:
+                            if t.startswith('\\'):
+                                key = self._map_ascii_key_code_to_key(int(t[1:]))
+                                #self._debug("ascii: %s\n" % (key))
+                                special.append(key)
+                                lkeys.append(key)
+                                nospecial = False
+                            else:
+                                lkeys.append(t)
+                    except:
+                        # text.append(t)
                         lkeys.append(t)
                         nospecial = True
                 else:
-                    text.append(t)
+                    # text.append(t)
                     lkeys.append(t)
                     nospecial = True
             else:
@@ -566,33 +584,29 @@ return !element.dispatchEvent(evt);
                 elif s==ke and first:
                     first = False
 
-        #text[:] = [x for x in text if x != ''] #removes empty entries
-        #self._debug("lkeys: %r\n" % (lkeys))
-
-        mlist=[]
+        num = []
+        nkeys = []
         #Processes ASCII codes inside text
-        for t, ke in enumerate(lkeys):
+        for t,ke in enumerate(lkeys):
             num = re.split("(\\\\+\\d+)",ke)
-        num[:] = [x for x in num if x != ''] #removes empty entries
-        for znum in num:
-            if re.match("\\\\+\\d+",znum):
-                char = znum.strip('\\')
-                m = _map_ascii_key_code_to_key(self,int(char))
-                mlist.append(m)
-            else:
-                mlist.append(znum)
+            num[:] = [x for x in num if x != ''] #removes empty entries
+            #self._debug("num: %r\n" % (num))
+            #mlist=[]
+            for znum in num:
+                if re.match("\\\\+\\d+",znum):
+                    char = znum.strip('\\')
+                    m = self._map_ascii_key_code_to_key(int(char))
+                    #mlist.append(m)
+                    nkeys.append(m)
+                else:
+                    #mlist.append(znum)
+                    nkeys.append(znum)
+            #keys = ''.join(mlist)
+            #lkeys[t] = keys
 
-        keys = ''.join(mlist)
+        #self._debug("2nd lkeys: %r\nnkeys: %s" % (lkeys, nkeys))
+        #self._debug("nkeys: %s" % (nkeys))
 
-        #print("final keys= %s special= %s\n" % (keys, special))
-        #print("joint list lkeys= %s \n" % (lkeys))
-        #select it
-        ##element = self._element_find(locator, True, True)
-
-        """
-        If keys[x] is ASCII put in sendkeys
-        Else put in Press down and up
-        """
         # self._map_named_key_code_to_special_key('BACKSPACE'),
         modifiers = [self._map_named_key_code_to_special_key('CONTROL'),
                      self._map_named_key_code_to_special_key('LEFT_CONTROL'),
@@ -603,7 +617,7 @@ return !element.dispatchEvent(evt);
         slist = []  #sendkey list
         plist = []  #presskey list down and up
         klist = []  #presskey list down
-        for k in lkeys:
+        for k in nkeys:
             #self._debug("k: %s\n" % (k))
             if k in modifiers:
                 slist.append('')
@@ -620,75 +634,37 @@ return !element.dispatchEvent(evt);
 
         #ActionChains(self._current_browser()).key_down(special_key1, element).key_down(special_key2, element).send_keys(key).key_up(special_key2, element).key_up(special_key1, element).perform()
         #self._debug("sl: %s\npl: %s\nmodifier: %s" % (slist, plist, modifiers))
-        self._debug("sl: %s\nkl: %s\npl: %s\n" % (slist, klist, plist))
+        #self._debug("sl: %s\nkl: %s\npl: %s\n" % (slist, klist, plist))
 
         mytext = ''
         text = False
         MyAction = ActionChains(self._current_browser())
-        """
-        for ke in lkeys[:]:
-            MyAction.key_down(ke, element)
-        MyAction.perform()
-        """
         for k, ke in enumerate(slist):
             if text and ke != '':
                 mytext += ke
-            if not text and klist[k] != '':
-                self._debug("kpress down %r " % (klist[k]))
-                if len(klist[k]) > 1:
-                    MyAction.key_down(klist[k], element)   # Works fine for BACKSPACE but not \\032
-                else:
-                    MyAction.send_keys(klist[k])
             if not text and plist[k] != '':
-                self._debug("press down %r " % (plist[k]))
+                #self._debug("press down %r " % (plist[k]))
                 MyAction.key_down(plist[k], element)
-                #MyAction.perform()
             if not text and ke != '':
                 mytext += ke
                 text = True
             if text and ( ke == '' or k == len(slist) - 1):
-                self._debug("%d send keys %s " % (k, mytext))
-                #MyAction.key_down(Keys.LEFT_ALT, element).key_up(Keys.LEFT_ALT, element)
-                #MyAction.send_keys(mytext)
-                # MyAction.key_up(Keys.NULL, element)
+                #self._debug("%d send keys %s " % (k, mytext))
                 MyAction.key_down(mytext, element)
-                #for l in mytext:
-                #    MyAction.key_down(l, element)
-                # MyAction.key_up(mytext, element)
-                # MyAction.perform()
-                # element.send_keys(mytext)
                 text = False
                 mytext = ''
+            if klist[k] != '':
+                if len(klist[k]) > 1:
+                    MyAction.key_down(klist[k], element)   # Works fine for BACKSPACE but not \\032
+                    #self._debug("len%d k%dpress down %r " % (len(klist[k]), k, klist[k]))
+                else:
+                    MyAction.send_keys(klist[k])
+                    #self._debug("len%d k%dsend key %r " % (len(klist[k]), k, klist[k]))
 
-            """
-            if text and plist[k] != '':
-                self._debug("1send keys %s " % (mytext))
-                MyAction.send_keys(mytext)
-                #MyAction.key_down(mytext, element)
-                #MyAction.perform()
-                #element.send_keys(mytext)
-                self._debug("press down %r " % (plist[k]))
-                MyAction.key_down(plist[k], element)
-                #MyAction.perform()
-                text = False
-                mytext = ''
-
-            if text and slist[-1] != '':
-                self._debug("last send keys %s " % (mytext))
-                element.send_keys(mytext)
-                #MyAction.send_keys(mytext)
-                #MyAction.key_down(mytext, element)
-                #MyAction.perform()
-                text = False
-                mytext = ''
-                #MyAction = ActionChains(self._current_browser())
-                #element.send_keys(mytext)
-            """
         for ke in reversed(plist):
             if ke != '':
-                self._debug("press up %r " % (ke))
+                #self._debug("press up %r " % (ke))
                 MyAction.key_up(ke, element)
-        #print("perform\n")
 
         MyAction.perform()
 
@@ -959,7 +935,13 @@ return !element.dispatchEvent(evt);
 
     def _map_named_key_code_to_special_key(self, key_name):
         try:
-           return getattr(Keys, key_name)
+            #mkey = ''
+            #for k, kn in list(key_name):
+            #    at = getattr(Keys, kn)
+            #    mkey += at.str()
+            #self._debug("key== %s" % (mkey))
+            return getattr(Keys, key_name)
+            #return mkey
         except AttributeError:
             message = "Unknown key named '%s'." % (key_name)
             self._debug(message)
