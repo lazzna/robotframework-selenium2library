@@ -11,4 +11,3 @@ chromedriver.log
 
 dist
 build
-test/ghostdriver.log

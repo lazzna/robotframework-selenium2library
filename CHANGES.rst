@@ -1,4 +1,4 @@
-﻿Release Notes
+Release Notes
 =============
 
 1.7.3
@@ -15,8 +15,6 @@
 
 1.7.2
 ----------------
-<<<<<<< HEAD
-=======
 - Added an argument called screenshot_root_directory that can be passed into S2L's
   constructor to specify where to store screenshots.
 - Added new keyword 'set_screenshot_directory' which can be used to set the output
@@ -59,12 +57,11 @@
 - Added new keyword 'Wait Until Page Does Not Contain'.
   [deiga]
 
->>>>>>> d11f6a419250469d7171bd3dcfdad6c31f4aedfb
 - Fixed ‘NoSuchWindowException' issue. Running keyword 'Select Window' after 'Close Window'
   will trigger this issue if locator has prefix 'name=','title=' or 'url='. Also fixed same
   issue for keywords 'Get Window Ids', 'Get Window Titles' and 'Get Window Names'.
   [divfor]
-  
+
 - Corrected error message in new keyword 'Wait Until Element Is Not
   Visible' to reflect element being visible instead of not visible.
   [joepurdy]
@@ -79,6 +76,9 @@
   [molsky]
 
 - Added new keyword 'Wait Until Page Does Not Contain Element'.
+  [molsky]
+
+- Added new keywords 'Wait Until Element Contains' and 'Wait Until Element Does Not Contain'
   [molsky]
 
 - Added new locator strategy, scLocator, for finding SmartClient and SmartGWT elements.
@@ -137,37 +137,6 @@
   a '=' by using the prefix 'default='. Also make locator prefixes
   space-insensitive.
   [ombre42]
-
-A big thank you to [eweitz] and [HelioGuilherme66] for getting the
-continuous integration builds to go green by fixing internal tests.
-
-A big thank you to [eweitz] and [HelioGuilherme66] for getting the
-continuous integration builds to go green by fixing internal tests.
-
-- Added support for negative indices for rows and columns in table-related
-  keywords.
-  [eweitz]
-
-- Added strategy for locating elements by partial link text with locator
-  prefix 'partial link'.
-  [lina1]
-
-- Added new keyword 'Clear Element Text' for clearing the text of text entry 
-  elements.
-  [emanlove]
-
-- Fixed issue where 'Select Window’ with url strategy fails to locate window
-  [laulaz]
-
-- Allow using key attributes (default strategy) when the locator contains
-  a '='. Also make locator prefixes space-insensitive.
-  [ombre42]
-
-- Fixed issue where a non-string assigned to window.id caused
-  'Select Window' and 'Get Window *' keywords to fail.
-
-A big thank you to [eweitz] and [HelioGuilherme66] for getting the
-continuous integration builds to go green by fixing internal tests.
 
 A big thank you to [eweitz] and [HelioGuilherme66] for getting the
 continuous integration builds to go green by fixing internal tests.
