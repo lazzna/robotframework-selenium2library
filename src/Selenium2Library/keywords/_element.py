@@ -5,7 +5,6 @@ from Selenium2Library import utils
 from Selenium2Library.locators import ElementFinder
 from Selenium2Library.locators import CustomLocator
 from keywordgroup import KeywordGroup
-import re
 
 try:
     basestring  # attempt to evaluate basestring
@@ -491,9 +490,10 @@ return !element.dispatchEvent(evt);
          or a NAMED KEY as described in the [https://selenium.googlecode.com/git/docs/api/py/webdriver/selenium.webdriver.common.keys.html|Selenium docs].
 
         Examples:
-        | Press Key | text_field   | q        | # The letter 'q'                              |
-        | Press Key | nav_console  | ARROW_UP | # Named ARROW_UP key                          |
-        | Press Key | login_button | \\\\13   | # ASCII code for Enter key                    |
+        | Press Key | text_field   | q        | # The letter 'q'                                |
+        | Press Key | nav_console  | ARROW_UP | # Named ARROW_UP key                            |
+        | Press Key | login_button | \\\\13   | # ASCII code for Enter key                      |
+        | Press Key | custom_input | mystring | # String to be entered different from named key |
 
         It's recommended to use named keys over ascii escapes (.i.e ``ENTER`` over ``\\\\13``)
 
@@ -507,166 +507,6 @@ return !element.dispatchEvent(evt);
         element = self._element_find(locator, True, True)
         # select it
         element.send_keys(key)
-
-    def press_keys(self, locator, keys):
-        """Simulates user pressing keys eventually modified with special keys on an element identified by `locator`.
-
-        `keys` are any human readable characters, or numerical ASCII codes lead by '\\\\'.
-
-        `special keys` are key names defined at [https://selenium.googlecode.com/git/docs/api/py/webdriver/selenium.webdriver.common.keys.html|Selenium docs].
-
-        To send `special keys` you must enclosed them with `+` or `-`, unless they are the first or the last values.
-
-        Examples:
-        | Press Keys | textarea     | SHIFT-a    |
-        | Press Keys | textarea     | END        |
-        | Press Keys | textarea     | CONTROL+a  |
-        | Press Keys | textarea     | abd+BACKSPACE+c |
-        | Press Keys | textarea     | CONTROL++  |
-        | Press Keys | textarea     | CONTROL--  |
-        | Press Keys | textarea     | SHIFT+CONTROL+ARROW_UP  |
-
-        Reference: http://selenium-python.readthedocs.org/en/latest/api.html#module-selenium.webdriver.common.keys
-        """
-
-        element = self._element_find(locator, True, True)
-
-        myargs = re.split("([+|-])", keys)
-
-        special = []
-        nospecial = True
-        lkeys = []
-        idx = 0
-        for t in myargs[:]:
-            if t != '' and nospecial:
-                if len(t) > 1:
-                    try:
-                        mkey = self._map_named_key_code_to_special_key(t)
-                        if mkey != None:
-                            #self._debug("special: %r\n" % (mkey))
-                            special.append(mkey)
-                            lkeys.append(mkey)
-                            nospecial = False
-                        else:
-                            if t.startswith('\\'):
-                                key = self._map_ascii_key_code_to_key(int(t[1:]))
-                                #self._debug("ascii: %s\n" % (key))
-                                special.append(key)
-                                lkeys.append(key)
-                                nospecial = False
-                            else:
-                                lkeys.append(t)
-                    except:
-                        # text.append(t)
-                        lkeys.append(t)
-                        nospecial = True
-                else:
-                    # text.append(t)
-                    lkeys.append(t)
-                    nospecial = True
-            else:
-                t = None
-                nospecial = True
-                idx = idx - 1
-            idx = idx +1
-            # Here is a special case, we must see if the previous key is [+|-] and remove it
-            if idx > 1 and not nospecial:
-                if re.match("[+|-]", lkeys[idx-2] ):
-                    tmp=lkeys.pop(idx-2)
-                    idx = idx - 1
-
-        special = list(set(special)) #removes repeated special keys
-        for s in special:
-            first = True
-            for k, ke in enumerate(lkeys):
-                if s==ke and not first:
-                    lkeys.pop(k)
-                elif s==ke and first:
-                    first = False
-
-        num = []
-        nkeys = []
-        #Processes ASCII codes inside text
-        for t,ke in enumerate(lkeys):
-            num = re.split("(\\\\+\\d+)",ke)
-            num[:] = [x for x in num if x != ''] #removes empty entries
-            #self._debug("num: %r\n" % (num))
-            #mlist=[]
-            for znum in num:
-                if re.match("\\\\+\\d+",znum):
-                    char = znum.strip('\\')
-                    m = self._map_ascii_key_code_to_key(int(char))
-                    #mlist.append(m)
-                    nkeys.append(m)
-                else:
-                    #mlist.append(znum)
-                    nkeys.append(znum)
-            #keys = ''.join(mlist)
-            #lkeys[t] = keys
-
-        #self._debug("2nd lkeys: %r\nnkeys: %s" % (lkeys, nkeys))
-        #self._debug("nkeys: %s" % (nkeys))
-
-        # self._map_named_key_code_to_special_key('BACKSPACE'),
-        modifiers = [self._map_named_key_code_to_special_key('CONTROL'),
-                     self._map_named_key_code_to_special_key('LEFT_CONTROL'),
-                     self._map_named_key_code_to_special_key('SHIFT'),
-                     self._map_named_key_code_to_special_key('LEFT_SHIFT'),
-                     self._map_named_key_code_to_special_key('ALT'),
-                     self._map_named_key_code_to_special_key('LEFT_ALT')]
-        slist = []  #sendkey list
-        plist = []  #presskey list down and up
-        klist = []  #presskey list down
-        for k in nkeys:
-            #self._debug("k: %s\n" % (k))
-            if k in modifiers:
-                slist.append('')
-                klist.append('')
-                plist.append(k)
-            elif self._isprintable(k):
-                slist.append(k)
-                klist.append('')
-                plist.append('')
-            else:
-                slist.append('')
-                klist.append(k)
-                plist.append('')
-
-        #ActionChains(self._current_browser()).key_down(special_key1, element).key_down(special_key2, element).send_keys(key).key_up(special_key2, element).key_up(special_key1, element).perform()
-        #self._debug("sl: %s\npl: %s\nmodifier: %s" % (slist, plist, modifiers))
-        #self._debug("sl: %s\nkl: %s\npl: %s\n" % (slist, klist, plist))
-
-        mytext = ''
-        text = False
-        MyAction = ActionChains(self._current_browser())
-        for k, ke in enumerate(slist):
-            if text and ke != '':
-                mytext += ke
-            if not text and plist[k] != '':
-                #self._debug("press down %r " % (plist[k]))
-                MyAction.key_down(plist[k], element)
-            if not text and ke != '':
-                mytext += ke
-                text = True
-            if text and ( ke == '' or k == len(slist) - 1):
-                #self._debug("%d send keys %s " % (k, mytext))
-                MyAction.key_down(mytext, element)
-                text = False
-                mytext = ''
-            if klist[k] != '':
-                if len(klist[k]) > 1:
-                    MyAction.key_down(klist[k], element)   # Works fine for BACKSPACE but not \\032
-                    #self._debug("len%d k%dpress down %r " % (len(klist[k]), k, klist[k]))
-                else:
-                    MyAction.send_keys(klist[k])
-                    #self._debug("len%d k%dsend key %r " % (len(klist[k]), k, klist[k]))
-
-        for ke in reversed(plist):
-            if ke != '':
-                #self._debug("press up %r " % (ke))
-                MyAction.key_up(ke, element)
-
-        MyAction.perform()
 
     # Public, links
 
@@ -897,12 +737,6 @@ return !element.dispatchEvent(evt);
             return element.is_displayed()
         return None
 
-    # match characters from inverted question mark to the end of the JSON-encodable range
-    _exclude = re.compile(ur'[\u00bf-\uffff]')
-
-    def _isprintable(self, s):
-        return not bool(self._exclude.search(s))
-
     def _map_ascii_key_code_to_key(self, key_code):
         map = {
             0: Keys.NULL,
@@ -925,28 +759,16 @@ return !element.dispatchEvent(evt);
         }
         key = map.get(key_code)
         if key is None:
-            try:
-               key = chr(key_code)
-            except ValueError:
-                message = "Invalid key code '\\\\%s'." % (key_code)
-                self._debug(message)
-                raise ValueError(message)
+            key = chr(key_code)
         return key
 
     def _map_named_key_code_to_special_key(self, key_name):
         try:
-            #mkey = ''
-            #for k, kn in list(key_name):
-            #    at = getattr(Keys, kn)
-            #    mkey += at.str()
-            #self._debug("key== %s" % (mkey))
-            return getattr(Keys, key_name)
-            #return mkey
+           return getattr(Keys, key_name)
         except AttributeError:
-            message = "Unknown key named '%s'." % (key_name)
-            self._debug(message)
-            return None
-            #raise ValueError(message)
+           message = "Unknown key named '%s'." % (key_name)
+           self._debug(message)
+           return(key_name)  # raise ValueError(message)
 
     def _parse_attribute_locator(self, attribute_locator):
         parts = attribute_locator.rpartition('@')
