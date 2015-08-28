@@ -486,29 +486,17 @@ return !element.dispatchEvent(evt);
 
     def press_key(self, locator, key):
         """Simulates user pressing key on element identified by `locator`.
-
-        `key` is either a single character, a numerical ASCII code of the key lead by '\\\\',
-         or a NAMED KEY as described in the [https://selenium.googlecode.com/git/docs/api/py/webdriver/selenium.webdriver.common.keys.html|Selenium docs].
-
+        `key` is either a single character, a string, or a numerical ASCII code of the key
+        lead by '\\\\'.
         Examples:
-        | Press Key | text_field   | q        | # The letter 'q'                                |
-        | Press Key | nav_console  | ARROW_UP | # Named ARROW_UP key                            |
-        | Press Key | login_button | \\\\13   | # ASCII code for Enter key                      |
-        | Press Key | custom_input | mystring | # String to be entered different from named key |
-
-        It's recommended to use named keys over ascii escapes (.i.e ``ENTER`` over ``\\\\13``)
-
-        NAMED KEY value is new in Selenium2Library 1.7.3.
+        | Press Key | text_field   | q |
+        | Press Key | text_field   | abcde |
+        | Press Key | login_button | \\\\13 | # ASCII code for enter key |
         """
-        if len(key) > 1:
-            if key.startswith('\\'):
-                key = self._map_ascii_key_code_to_key(int(key[1:]))
-            else:
-                mkey = self._map_named_key_code_to_special_key(key)
-                if mkey is not None:
-                    key = mkey
+        if key.startswith('\\') and len(key) > 1:
+            key = self._map_ascii_key_code_to_key(int(key[1:]))
         element = self._element_find(locator, True, True)
-        # select it
+        #select it
         element.send_keys(key)
 
     def press_keys(self, locator, *keys):
@@ -534,8 +522,6 @@ return !element.dispatchEvent(evt);
         """
         for arg_keys in keys:
             if len(arg_keys) == 1:      # Call Press Key
-                #element = self._element_find(locator, True, True)
-                #element.send_keys(arg_keys)
                 self.press_key(locator, arg_keys)
             else:
                 self._mpress_keys(locator, arg_keys)
@@ -552,26 +538,21 @@ return !element.dispatchEvent(evt);
         for t in myargs[:]:
             if t != '' and nospecial:
                 if len(t) > 1:
-                    try:
-                        mkey = self._map_named_key_code_to_special_key(t)
-                        if mkey != None:
-                            #self._debug("special: %r\n" % (mkey))
-                            special.append(mkey)
-                            lkeys.append(mkey)
-                            nospecial = False
-                        else:
-                            if t.startswith('\\'):
-                                key = self._map_ascii_key_code_to_key(int(t[1:]))
-                                #self._debug("ascii: %s\n" % (key))
-                                special.append(key)
-                                lkeys.append(key)
-                                nospecial = False
-                            else:
-                                lkeys.append(t)
-                    except: #AttributeError:  
-                        # text.append(t)
+                    mkey = self._map_named_key_code_to_special_key(t)
+                    if mkey is not None:
+                        # self._debug("special: %r\n" % (mkey))
+                        special.append(mkey)
+                        lkeys.append(mkey)
+                        nospecial = False
+
+                    else:
                         lkeys.append(t)
-                        nospecial = True
+                    """
+                        key = t
+                        if t.startswith('\\'):
+                            key = self._map_ascii_key_code_to_key(int(t[1:]))
+                        lkeys.append(key)
+                    """
                 else:
                     # text.append(t)
                     #self._debug("Normal key size one: %s\n" % (t))
@@ -588,6 +569,7 @@ return !element.dispatchEvent(evt);
                     tmp=lkeys.pop(idx-2)
                     idx = idx - 1
 
+        """
         special = list(set(special)) #removes repeated special keys
         for s in special:
             first = True
@@ -596,6 +578,7 @@ return !element.dispatchEvent(evt);
                     lkeys.pop(k)
                 elif s==ke and first:
                     first = False
+        """
 
         num = []
         nkeys = []
@@ -614,11 +597,6 @@ return !element.dispatchEvent(evt);
                 else:
                     #mlist.append(znum)
                     nkeys.append(znum)
-            #keys = ''.join(mlist)
-            #lkeys[t] = keys
-
-        #self._debug("2nd lkeys: %r\nnkeys: %s" % (lkeys, nkeys))
-        #self._debug("nkeys: %s" % (nkeys))
 
         # self._map_named_key_code_to_special_key('BACKSPACE'),
         modifiers = [self._map_named_key_code_to_special_key('CONTROL'),
@@ -954,11 +932,7 @@ return !element.dispatchEvent(evt);
         }
         key = map.get(key_code)
         if key is None:
-            try:
-               key = chr(key_code)
-            except ValueError:
-                message = "Invalid key code '\\\\%s'." % (key_code)
-                self._debug(message)
+            key = chr(key_code)
         return key
 
     def _map_named_key_code_to_special_key(self, key_name):
@@ -967,8 +941,7 @@ return !element.dispatchEvent(evt);
         except AttributeError:
             message = "Unknown key named '%s'." % (key_name)
             self._debug(message)
-            return None
-            #return(key_name)  # raise ValueError(message)
+            return None # raise ValueError(message)
 
     def _parse_attribute_locator(self, attribute_locator):
         parts = attribute_locator.rpartition('@')
