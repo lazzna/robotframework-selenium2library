@@ -28,14 +28,14 @@ Input Password
     Verify Location Is "forms/submit.html"
 
 Press Key
-  [Setup]  Go To Page "forms/login.html"
-  Cannot Be Executed in IE
-  Press Key    username_field    James Bon
-  Press Key    username_field    \\100
-  Textfield Value Should Be    username_field    James Bond
-  Press Key    password_field    f
-  Press Key    login_button    \\10
-  Verify Location Is "forms/submit.html"
+    [Setup]    Go To Page "forms/login.html"
+    Cannot Be Executed in IE
+    Press Key    username_field    James Bon
+    Press Key    username_field    \\100
+    Textfield Value Should Be    username_field    James Bond
+    Press Key    password_field    f
+    Press Key    login_button    \\13
+    Verify Location Is "forms/submit.html"
 
 Attempt Clear Element Text On Non-Editable Field
     [Documentation]    Attempt Clear Element Text On Non-Editable Field
