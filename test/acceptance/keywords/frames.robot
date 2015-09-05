@@ -47,6 +47,7 @@ Select And Unselect Frame should also work with iframes
 Select Frame with non-unique name attribute
     [Documentation]    Descerning frame 'left' from link 'left'.
     [Setup]    Go To Page "frames/poorlynamedframe.html"
+    Cannot Be Executed In PhantomJS
     Run Keyword And Expect Error    NoSuchFrameException*    Select Frame    left
     Select Frame    xpath=//frame[@name='left']|//iframe[@name='left']
     Click Link    foo
