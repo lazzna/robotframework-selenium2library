@@ -61,9 +61,7 @@ Choose File
     [Documentation]    Choose File
     [Setup]    Navigate To File Upload Form And Create Temp File To Upload
     Choose File    file_to_upload    ${CURDIR}${/}temp.txt
-    ${dep_browser}=    Set Variable If
-    ...    '${BROWSER}'.lower() == 'ff' or '${BROWSER}'.lower() == 'firefox'
-    ...    temp.txt    C:\\fakepath\\temp.txt    #Needs to be checked in Windows and OS X
+    ${dep_browser}=    Set Variable If    '${BROWSER}'.lower() == 'ff' or '${BROWSER}'.lower() == 'firefox'    temp.txt    C:\\fakepath\\temp.txt    #Needs to be checked in Windows and OS X
     Textfield Value Should Be    name= file_to_upload    ${dep_browser}
     [Teardown]    Remove File    ${CURDIR}${/}temp.txt
 
@@ -82,5 +80,6 @@ Value Should Be Cancel
 Navigate To File Upload Form And Create Temp File To Upload
     [Documentation]    Navigate To File Upload Form And Create Temp File To Upload
     Cannot Be Executed in IE
+    Cannot Be Executed In PhantomJS
     Go To Page "forms/file_upload_form.html"
     Touch    ${CURDIR}${/}temp.txt
