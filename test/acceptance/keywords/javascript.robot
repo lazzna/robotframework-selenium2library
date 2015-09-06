@@ -12,18 +12,19 @@ Clicking Elements Should Activate Javascript
 
 Alert Should Be Present
     [Documentation]    Alert Should Be Present
-    [Setup]    Go To Page "javascript/alert.html"
+    [Setup]    Run Keywords    Cannot Be Executed In PhantomJS    AND    Go To Page "javascript/alert.html"
+    ...    # With PhantomJS fails with "ValueError: No JSON object could be decoded"
     Click Link    Click Me!
     Alert Should Be Present
     Click Link    Click Me Too!
     Alert Should Be Present    MULTILINE ALERT!
     Click Link    Click Me!
-    Run Keyword And Expect Error    Alert text should have been 'foo bar' but was 'ALERT!'
-    ...    Alert Should Be Present    foo bar
+    Run Keyword And Expect Error    Alert text should have been 'foo bar' but was 'ALERT!'    Alert Should Be Present    foo bar
 
 Get Alert Message
     [Documentation]    Get Alert Message
-    [Setup]    Go To Page "javascript/alert.html"
+    [Setup]    Run Keywords    Cannot Be Executed In PhantomJS    AND    Go To Page "javascript/alert.html"
+    ...    # With PhantomJS fails with "ValueError: No JSON object could be decoded"
     Click Link    Click Me!
     ${msg} =    Get Alert Message
     Should Be Equal    ${msg}    ALERT!
@@ -31,7 +32,8 @@ Get Alert Message
 
 Read Alert Message
     [Documentation]    Read Alert Message
-    [Setup]    Go To Page "javascript/alert.html"
+    [Setup]    Run Keywords    Cannot Be Executed In PhantomJS    AND    Go To Page "javascript/alert.html"
+    ...    # With PhantomJS fails with "ValueError: No JSON object could be decoded"
     Click Link    Click Me!
     ${msg} =    Get Alert Message    ${FALSE}
     Should Be Equal    ${msg}    ALERT!
@@ -40,7 +42,8 @@ Read Alert Message
 
 Input Text Into Prompt
     [Documentation]    Input Text Into Prompt
-    [Setup]    Go To Page "javascript/alert_prompt.html"
+    [Setup]    Run Keywords    Cannot Be Executed In PhantomJS    AND    Go To Page "javascript/alert_prompt.html"
+    ...    # With PhantomJS fails with "ValueError: No JSON object could be decoded"
     Click Element    css=button
     Input Text Into Prompt    myname
     Dismiss Alert
@@ -60,6 +63,7 @@ Mouse Down On Link
 
 Confirm Action
     [Documentation]    Confirm Action
+    Cannot Be Executed In PhantomJS    # With PhantomJS fails with "ValueError: No JSON object could be decoded"
     Click Button    Change the title
     ${msg}=    Confirm Action
     Title Should Be    Changed after confirmation
@@ -67,6 +71,7 @@ Confirm Action
 
 Cancel Action
     [Documentation]    Cancel Action
+    Cannot Be Executed In PhantomJS    # With PhantomJS fails with "ValueError: No JSON object could be decoded"
     Choose Cancel On Next Confirmation
     Click Button    Change the title
     ${msg}=    Confirm Action
