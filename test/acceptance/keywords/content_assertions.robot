@@ -26,14 +26,14 @@ Title Should Be
 
 Page Should Contain
     [Documentation]    LOG 2:5 Current page contains text 'needle'.
-    ...    LOG 4.1:10 REGEXP: (?i)<html>.*</html>
+    ...    LOG 4.1:10 REGEXP: (?i)<html.*</html>
     Page Should Contain    needle
     Page Should Contain    This is the haystack
     Run Keyword And Expect Error    Page should have contained text 'non existing text' but did not
     ...    Page Should Contain    non existing text
 
 Page Should Contain With Custom Log Level
-    [Documentation]    LOG 2.1:10 DEBUG REGEXP: (?i)<html>.*</html>
+    [Documentation]    LOG 2.1:10 DEBUG REGEXP: (?i)<html.*</html>
     Run Keyword And Expect Error    Page should have contained text 'non existing text' but did not
     ...    Page Should Contain    non existing text    DEBUG
 
@@ -51,13 +51,13 @@ Page Should Contain With Frames
 
 Page Should Not Contain
     [Documentation]    LOG 2:8 Current page does not contain text 'non existing text'.
-    ...    LOG 3.1:7 REGEXP: (?i)<html .*</html>
+    ...    LOG 3.1:7 REGEXP: (?i)<html.*</html>
     Page Should Not Contain    non existing text
     Run Keyword And Expect Error    Page should not have contained text 'needle'
     ...    Page Should Not Contain    needle
 
 Page Should Not Contain With Custom Log Level
-    [Documentation]    LOG 2.1:7 DEBUG REGEXP: (?i)<html>.*</html>
+    [Documentation]    LOG 2.1:7 DEBUG REGEXP: (?i)<html.*</html>
     Run Keyword And Expect Error    Page should not have contained text 'needle'
     ...    Page Should Not Contain    needle    DEBUG
 
