@@ -163,23 +163,23 @@ Press Invalid Keys
     Run Keyword And Expect Error    *    Press Keys    unknown    +WORNG_KEY+a
     # Run Keyword And Expect Error    *    Press Keys    textarea    a-WORNG_KEY
 
-Press Key Words
-    [Documentation]    Former Press Key with words
-    [Setup]    Go To Page "forms/login.html"
-    #Cannot Be Executed in IE
-    Press Keys    username_field    James Bond
-    Press Keys    username_field    HOME
-    Press Keys    username_field    END
-    Press Keys    username_field    ARROW_LEFT
-    Press Keys    username_field    ARROW_LEFT
-    Press Keys    username_field    ARROW_LEFT
-    Press Keys    username_field    DELETE
-    Press Keys    username_field    ARROW_LEFT
-    Press Keys    username_field    ARROW_RIGHT
-    Press Keys    username_field    \\108    #This is the 'l' char
-    Press Keys    username_field    o
-    ${text} =    Get Value    username_field
-    Should Be Equal    ${text}    James Blond
-    Press Keys    password_field    f9
-    Press Keys    login_button    ENTER
-    Verify Location Is "forms/submit.html"
+#Press Key Words
+#    [Documentation]    Former Press Key with words
+#    [Setup]    Go To Page "forms/login.html"
+#    #Cannot Be Executed in IE
+#    Press Keys    username_field    James Bond
+#    Press Keys    username_field    HOME
+#    Press Keys    username_field    END
+#    Press Keys    username_field    LEFT
+#    Press Keys    username_field    LEFT
+#    Press Keys    username_field    LEFT
+#    Press Keys    username_field    DELETE
+#    Press Keys    username_field    LEFT
+#    Press Keys    username_field    RIGHT
+#    Press Keys    username_field    \\108    #This is the 'l' char
+#    Press Keys    username_field    o
+#    ${text} =    Get Value    username_field
+#    Should Be Equal    ${text}    James Blond
+#    Press Keys    password_field    f9
+#    Press Keys    login_button    ENTER
+#    Verify Location Is "forms/submit.html"
