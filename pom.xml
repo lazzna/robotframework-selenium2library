@@ -1,0 +1,34 @@
+<!-- This pom is used only for releasing the jar distribution to Sonatype repositories.
+     More information in BUILD.rst. -->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.robotframework</groupId>
+  <artifactId>Selenium2Library</artifactId>
+  <packaging>jar</packaging>
+  <name>Selenium2Library</name>
+  <version>2.9.2.dev20150828</version>
+  <description>Selenium Webdriver Library for Robot Framework</description>
+  <url>http://robotframework.org</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+      <url>https://github.com/robotframework/Selenium2Library</url>
+      <connection>scm:git:https://github.com/robotframework/Selenium2Library</connection>
+      <developerConnection>scm:git:https://github.com/robotframework/Selenium2Library</developerConnection>
+  </scm>
+  <developers>
+    <developer>
+      <id>Selenium2Library and Robot Framework developers</id>
+      <email>robotframework@gmail.com</email>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
+</project>
