@@ -35,7 +35,7 @@ setup(name         = 'robotframework-selenium2library',
       install_requires = [
 							'decorator >= 3.3.2',
 							'selenium >= 2.32.0',
-							'robotframework >= 2.6.0',
+							'robotframework >= 2.8.7',
 							'docutils >= 0.8.1'
 						 ],
       py_modules=['ez_setup'],
