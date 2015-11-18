@@ -5,6 +5,7 @@ from Selenium2Library import utils
 from Selenium2Library.locators import ElementFinder
 from Selenium2Library.locators import CustomLocator
 from keywordgroup import KeywordGroup
+import time
 
 try:
     basestring  # attempt to evaluate basestring
@@ -680,6 +681,16 @@ return !element.dispatchEvent(evt);
         """
         self._element_finder.unregister(strategy_name)
 
+    # Public, element changes
+
+    def highlight(self, locator):
+        """Highlights (blinks) the element identified by `locator`.
+
+        Default style is `yellow` background with `red` solid border.
+        """
+        self._debug("Highlighting element '%s'." % locator)
+        self._highlight(locator)
+
     # Private
 
     def _element_find(self, locator, first_only, required, tag=None):
@@ -715,6 +726,18 @@ return !element.dispatchEvent(evt);
     def _get_value(self, locator, tag=None):
         element = self._element_find(locator, True, False, tag=tag)
         return element.get_attribute('value') if element is not None else None
+
+    def _highlight(self, locator):
+        element = self._element_find(locator, True, False)
+        if element is None:
+            return
+
+        def apply_style(s):
+            self._current_browser().execute_script("arguments[0].setAttribute('style', arguments[1]);", element, s)
+        original_style = element.get_attribute('style')
+        apply_style("background: yellow; border: 2px solid red;")
+        time.sleep(.3)
+        apply_style(original_style)
 
     def _is_enabled(self, locator):
         element = self._element_find(locator, True, True)
