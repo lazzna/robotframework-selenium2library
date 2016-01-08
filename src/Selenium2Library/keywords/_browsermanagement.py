@@ -1,3 +1,5 @@
+from builtins import str
+from past.builtins import basestring
 import os
 import robot
 from robot.errors import DataError
@@ -524,7 +526,7 @@ class _BrowserManagementKeywords(KeywordGroup):
 
         browser_name = browser_name.lower().replace(' ', '')
 
-        if browser_name not in BROWSERS.keys():
+        if browser_name not in list(BROWSERS.keys()):
             raise ValueError(browser_name + " is not a supported browser.")
 
         browser_name, browser_capabilities = BROWSERS.get(browser_name)
