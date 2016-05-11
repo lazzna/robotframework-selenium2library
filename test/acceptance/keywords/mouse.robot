@@ -32,6 +32,18 @@ Mouse Up
     Textfield Value Should Be    el_for_mouseup    mouseup el_for_mouseup
     Run Keyword And Expect Error    ERROR: Element not_there not found.    Mouse Up    not_there
 
+Mouse Down At
+    [Documentation]    Mouse Down At (element's coordinates)
+    Mouse Down At  el_for_mousedownat  +1  +1
+    Textfield Value Should Be  el_for_mousedownat  mousedownat-1-1 el_for_mousedownat
+    Run Keyword And Expect Error  ERROR: Element not_there not found.  Mouse Up At  not_there  +1  +1
+	
+Mouse Up At
+    [Documentation]    Mouse Up At (element's coordinates)
+    Mouse Up At  el_for_mouseupat  +1  +1
+    Textfield Value Should Be  el_for_mouseupat  mouseupat-1-1 el_for_mouseupat
+    Run Keyword And Expect Error  ERROR: Element not_there not found.  Mouse Up At  not_there  +1  +1
+	
 Focus
     [Documentation]    Focus
     Focus    el_for_focus
