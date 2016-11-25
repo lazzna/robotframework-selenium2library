@@ -46,8 +46,9 @@ def acceptance_tests(interpreter, browser, args):
 
 def start_http_server():
     server_output = TemporaryFile()
+    #server_output = open("server.log", 'w+', buffering=False)
     Popen(['python', env.HTTP_SERVER_FILE ,'start'],
-          stdout=server_output, stderr=server_output)
+          bufsize=0, stdout=server_output, stderr=server_output)
 
 def execute_tests(runner, args):
     if not os.path.exists(env.RESULTS_DIR):
