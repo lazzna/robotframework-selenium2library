@@ -45,7 +45,7 @@ def acceptance_tests(interpreter, browser, args):
     return process_output(args)
 
 def start_http_server():
-    server_output = TemporaryFile()
+    server_output = TemporaryFile()  # Comment this line and uncomment next to keep log file
     #server_output = open("server.log", 'w+', buffering=False)
     Popen(['python', env.HTTP_SERVER_FILE ,'start'],
           bufsize=0, stdout=server_output, stderr=server_output)
