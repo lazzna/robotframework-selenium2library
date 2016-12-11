@@ -1,7 +1,10 @@
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/336012
 
+import os
+import httplib
 import SimpleHTTPServer
 import BaseHTTPServer
+
 import httplib
 import os
 import socket
