@@ -7,7 +7,8 @@ from setuptools import setup
 
 CURDIR = dirname(abspath(__file__))
 
-execfile(join(CURDIR, 'src', 'Selenium2Library', 'version.py'))
+myversion = join(CURDIR, 'src', 'Selenium2Library', 'version.py')
+exec(compile(open(myversion, "rb").read(), myversion, 'exec'))
 
 DESCRIPTION = """
 Selenium2Library is a web testing library for Robot Framework
