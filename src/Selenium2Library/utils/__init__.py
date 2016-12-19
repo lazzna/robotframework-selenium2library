@@ -2,6 +2,12 @@ from . import events
 from .browsercache import BrowserCache
 from .librarylistener import LibraryListener
 
+try:
+    UNICODE_EXISTS = bool(type(unicode))
+except NameError:
+    def unicode(s):
+        return str(s)
+
 
 def escape_xpath_value(value):
     value = unicode(value)

@@ -12,6 +12,11 @@ from Selenium2Library.locators import WindowManager
 
 from .keywordgroup import KeywordGroup
 
+try:
+    UNICODE_EXISTS = bool(type(unicode))
+except NameError:
+    def unicode(s):
+        return str(s)
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 FIREFOX_PROFILE_DIR = os.path.join(ROOT_DIR, 'resources', 'firefoxprofile')
