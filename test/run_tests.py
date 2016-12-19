@@ -26,6 +26,7 @@ Examples:
 """
 
 from __future__ import print_function
+from os.path import abspath, dirname, join
 
 from contextlib import contextmanager
 import os
@@ -40,7 +41,6 @@ except ImportError:
              'Install it with `pip install robotstatuschecker`.')
 
 import env
-from run_unit_tests import run_unit_tests
 
 
 ROBOT_OPTIONS = [
@@ -60,10 +60,12 @@ REBOT_OPTIONS = [
     '--noncritical', 'known issue {browser}',
 ]
 
+CURDIR = dirname(abspath(__file__))
 
 def unit_tests():
     print('Running unit tests')
-    failures = run_unit_tests()
+    pypath = sys.executable
+    failures = subprocess.call([pypath, os.path.join(CURDIR,'run_unit_tests.py')])
     if failures:
         print('\nUnit tests failed! Not running acceptance tests.')
         sys.exit(failures)
