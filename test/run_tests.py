@@ -17,31 +17,32 @@ Arguments:
   browser:        Any browser supported by the library (e.g. `chrome`or
                   `firefox`)
   --interpreter:  Any Python interpreter supported by the library (e.g.
-                  `python`, `jython` or `c:\\Python27\\python.exe`). By
-                  default set to `python`.
+                  `python`, `jython` or `c:\\Python27\\python.exe`). Use 
+                  version explicitly (e.g. `python2` or `python3.4`). By
+                  default is set to `python`. 
   --suite:        Selects the test suites by name.
   --scusername:   Username to access Sauce Labs to order browsers when
                   running test from local computer.
   --sckey:        Access key for Sauce Labs account.
 
-When running test by using browser from Sauce labs, it is required that
-the Sauce Connect is used. The Sauce Connect allows the browser from Sauce Labs
+When running test by using browser from Sauce labs, it is required to use
+Sauce Connect. The Sauce Connect allows the browser from Sauce Labs to
 reach the acceptance test webserver. The acceptance test uses tunnel with
-name `localtunnel` and therefore when establishing  the Sauce Connect tunnel
+name `localtunnel` and therefore when establishing the Sauce Connect tunnel
 use the following command:
 `bin/sc -u YOUR_USERNAME -k YOUR_ACCESS_KEY -i localtunnel`
 
-More details and to downlaod Sauce Connect visit:
+More details and to download Sauce Connect visit:
 https://wiki.saucelabs.com/display/DOCS/High+Availability+Sauce+Connect+Setup
 
 Examples:
 
-  run_tests.py python chrome
-  run_tests.py jython firefox --suite list
-  run_tests.py python chrome --scusername your_username --sckey account_key
+  run_tests.py --interpreter python chrome
+  run_tests.py --interpreter jython firefox --suite list
+  run_tests.py --interpreter python chrome --scusername your_username \
+               --sckey account_key
 """
 
-from __future__ import print_function
 
 from contextlib import contextmanager
 import os
@@ -53,7 +54,7 @@ from robot import rebot_cli
 try:
     import robotstatuschecker
 except ImportError:
-    sys.exit('Required `robotstatuschecker` not installed.\n'
+    sys.exit('Required `robotstatuschecker` is not installed.\n'
              'Install it with `pip install robotstatuschecker`.')
 
 import env
@@ -76,10 +77,12 @@ REBOT_OPTIONS = [
     '--noncritical', 'known issue {browser}',
 ]
 
+CURDIR = os.path.dirname(os.path.abspath(__file__))
 
-def unit_tests():
+
+def unit_tests(interpreter):
     print('Running unit tests')
-    failures = run_unit_tests()
+    failures = subprocess.call([interpreter, os.path.join(CURDIR,'run_unit_tests.py')])
     if failures:
         print('\nUnit tests failed! Not running acceptance tests.')
         sys.exit(failures)
@@ -135,7 +138,7 @@ def log_start(command_list, sauceusername, saucekey):
     for hidden in [sauceusername, saucekey]:
         if hidden:
             command = command.replace(hidden, '*' * len(hidden))
-    print()
+    print('')
     print('Starting test execution with command:')
     print(command)
 
@@ -187,7 +190,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--interpreter',
         default='python',
-        help='Interpreter used run the test'
+        help='Interpreter used to run the test'
     )
     parser.add_argument('browser', help='Browser used in testing')
     parser.add_argument(
@@ -197,25 +200,25 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '--scusername',
-        help='Username to order browser from SaucuLabs'
+        help='Username to order browser from Sauce Labs'
     )
     parser.add_argument(
         '--sckey',
-        help='Access key to order browser from SaucuLabs'
+        help='Access key to order browser from Sauce Labs'
     )
 
     args = parser.parse_args()
     browser = args.browser.lower().strip()
-    if browser != 'chrome' and env.TRAVIS_EVENT_TYPE != 'cron':
-        print(
-            'Can not run test with browser "{}" from SauceLabs\n'
-            'SauceLabs can be used only when running with corn and from '
-            'Selenium2Library master banch, but your event type '
-            'was "{}"'.format(browser, env.TRAVIS_EVENT_TYPE)
-        )
-        sys.exit(0)
-    sauceusername, saucekey = sauce_credentials(
-        args.scusername, args.sckey)
-    unit_tests()
+    if env.TRAVIS:
+        if browser != 'chrome' and env.TRAVIS_EVENT_TYPE != 'cron':
+            print(
+                'Can not run test with browser "{}" from Sauce Labs\n'
+                'Sauce Labs can be used only when running with cron and from '
+                'Selenium2Library master branch, but your event type '
+                'was "{}"'.format(browser, env.TRAVIS_EVENT_TYPE)
+            )
+            sys.exit(0)
+    sauceusername, saucekey = sauce_credentials(args.scusername, args.sckey)
+    unit_tests(args.interpreter)
     acceptance_tests(args.interpreter, browser, args.suite,
                      sauceusername, saucekey)
